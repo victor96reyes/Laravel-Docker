@@ -1,0 +1,47 @@
+version: '3.7'
+
+services:
+################ App Laravel ################
+  laravel-app:
+    build:
+      context: '.'
+    container_name: laravel-app
+    volumes:
+      - ./laravel:/var/www/html
+    ports:
+      - 8000:80
+
+    networks:
+    - lan-laravel
+############ Servidor de base de datos #######
+  laravel-db:
+    image: mysql:8.0
+    container_name: laravel-db
+    volumes:
+      - ./sql-data:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=laravel
+      - MYSQL_USER=user1
+      - MYSQL_PASSWORD=pass1
+    ports:
+      - 3306:3306
+    networks:
+    - lan-laravel
+######################## phpMyAdmin ###########
+  phpmyadmin:
+    image: phpmyadmin
+    links: 
+      - laravel-db
+    networks:
+      - lan-laravel
+    ports:
+      - 80:80
+    environment:
+      PMA_ARBITRARY: 1
+      PMA_HOST: laravel-db
+      MYSQL_ROOT_PASSWORD: root
+
+networks:
+  lan-laravel:
+
